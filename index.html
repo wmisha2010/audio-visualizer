@@ -411,7 +411,6 @@
 
       smoothBass = lerp(smoothBass, targetBass, 0.15);
       
-      // Смещаем центр визуализатора чуть выше середины экрана, чтобы учесть нижнюю панель
       translate(width / 2, (height / 2) - 45);
 
       for (let p of ambientParticles) {
@@ -564,8 +563,18 @@
       }
 
       async function loadTracks() {
+        // Треки из репозитория GitHub
+        let remoteTracks = [
+          {
+            id: 'remote_1',
+            name: 'SiberiaRU124 — Six-Seven',
+            url: 'https://raw.githubusercontent.com/wmisha2010/audio-visualizer/main/music/%40SiberiaRU124%20-%20Six-Seven.mp3',
+            isRemote: true
+          }
+        ];
+
         let dbTracks = await getAllTracksFromDB();
-        playlist = [...dbTracks];
+        playlist = [...remoteTracks, ...dbTracks];
 
         playlistCountElem.innerText = playlist.length;
         renderPlaylistUI();
@@ -596,6 +605,10 @@
           btnDel.innerText = '✕';
           btnDel.onclick = async (e) => {
             e.stopPropagation();
+            if (track.isRemote) {
+              alert("Этот трек загружен из репозитория GitHub.");
+              return;
+            }
             await deleteTrackFromDB(track.id);
             playlist.splice(idx, 1);
             renderPlaylistUI();
